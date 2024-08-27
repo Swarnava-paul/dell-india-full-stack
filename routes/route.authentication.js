@@ -8,15 +8,14 @@ const UserModel = require('../models/model.user')
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
 const session = require('express-session')
-//let users = [];
 
-AuthRouter.use(session({ secret: 'mnkjioho132', resave: false, saveUninitialized: true }));
+AuthRouter.use(session({ secret:process.env.Session_Secret_Key, resave: false, saveUninitialized: true }));
 AuthRouter.use(passport.initialize());
 AuthRouter.use(passport.session());
 
 passport.use(new GoogleStrategy({
-    clientID: "456819040161-tjein5gh5n8m67pvsr6e912qv95sumn3.apps.googleusercontent.com",
-    clientSecret: "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",
+    clientID: process.env.Google_Auth_ClientId,
+    clientSecret: process.env.Google_Auth_Client_Secret,
     callbackURL: `http://localhost:4000/login/auth/google/callback`
   },
   async function(accessToken, refreshToken, profile, cb) {
