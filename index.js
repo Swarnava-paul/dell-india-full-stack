@@ -8,13 +8,16 @@ const database = require('./config/connection.db')
 
 const server = express(); // server express
 const ProductModel = require('./models/model.Product')
-server.use(cors('*'));
+server.use(cors({
+    origin: ['http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'],
+    credentials: true,
+  }));
 
 // routes
 server.use('/login',AuthRouter);
 server.use('/service',ServiceRouter);
 
-server.get('/ServerHealthCheck',(req,res)=>{
+server.get('/serverHealthCheck',(req,res)=>{
 res.end('Server is running ok')
 })
 
