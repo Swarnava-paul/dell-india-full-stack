@@ -61,7 +61,7 @@ AuthRouter.get('/auth/google/callback',
         /*res.status(200).json({message:"Login Successful",token,name:firstName,email})*/
          const production = `https://dell-india.netlify.app?token=${token}`;
         const development = `http://localhost:5173?token=${token}`
-        res.redirect(development)
+        res.redirect(production)
       }catch(e) {
        res.status(500).json({message:"Internal server Error"})
       }
