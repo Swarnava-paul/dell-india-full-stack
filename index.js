@@ -11,7 +11,7 @@ const logRequest = require('./middlewares/req.log')
 
 
 // routes
-const cors = require('cors');
+
 server.use(cors({
        origin: 'https://dell-india.netlify.app', // Replace with your frontend domain
        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
