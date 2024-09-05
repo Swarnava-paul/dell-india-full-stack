@@ -11,6 +11,17 @@ var GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
 const session = require('express-session');
 
+AuthRouter.use(cors({
+  origin: ['http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+AuthRouter.options(cors({origin: ['http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
+
 AuthRouter.use(session({ secret:process.env.Session_Secret_Key, resave: false, saveUninitialized: true }));
 AuthRouter.use(passport.initialize());
 AuthRouter.use(passport.session());
@@ -46,10 +57,7 @@ passport.deserializeUser(async function(id, cb) {
   cb(null, user);
 }); // for retrive user from the session by using 
 
-AuthRouter.use(cors({
-  origin: ['http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'],
-  credentials: true,
-}));
+
 
 AuthRouter.get('/auth/google',
 passport.authenticate('google', { scope: ['profile','email'] }))
