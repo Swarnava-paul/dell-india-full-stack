@@ -9,7 +9,7 @@ const server = express(); // server express
 const ProductModel = require('./models/model.Product')
 const logRequest = require('./middlewares/req.log')
 server.use(cors({
-    origin: ['http://localhost:4000','*', 'http://localhost:5173','https://dell-india.netlify.app/'],
+    origin: ['http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'],
     credentials: true,
   }));
 
