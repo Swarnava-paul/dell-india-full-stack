@@ -19,7 +19,7 @@ const callbackuri = 'https://dell-india-full-stack.onrender.com/login/auth/googl
 passport.use(new GoogleStrategy({
     clientID: process.env.Google_Auth_ClientId,
     clientSecret: process.env.Google_Auth_Client_Secret,
-    callbackURL: `http://localhost:${process.env.SERVER_RUNNING_PORT}/login/auth/google/callback`
+    callbackURL: callbackuri,
   },
   async function(accessToken, refreshToken, profile, cb) {
     const email = profile.emails[0].value;
@@ -64,7 +64,7 @@ AuthRouter.get('/auth/google/callback',
         /*res.status(200).json({message:"Login Successful",token,name:firstName,email})*/
          const production = `https://dell-india.netlify.app?token=${token}`;
         const development = `http://localhost:5173?token=${token}`
-        res.redirect(development)
+        res.redirect(production)
       }catch(e) {
        res.status(500).json({message:"Internal server Error"})
       }
