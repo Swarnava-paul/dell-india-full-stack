@@ -28,25 +28,84 @@ ServiceRouter.post('/addCart',checkAuthentication,async(req,res)=>{
 })
 
 ServiceRouter.get('/getProduct',async(req,res)=>{
- 
+
     try{
-     if(req.query.series) {
-      const series = req.query.series;
-      const regex = new RegExp(series,'i')
-      const laptops = await ProductModel.find({model:{$regex:regex}})
+    const {series,ram,storage,graphics,price,processor} = req.query;
+    
+    if(series) {
+    if(series == 'G series') {
+        const [gSeries] = series.split(" ")[0]
+        const returnedValue = await hybridSearch("model",gSeries,'u');
+        if(returnedValue.length > 0) {
+            return res.status(200).json({message:"laptops",laptops:returnedValue})
+        }
+        return res.status(400).json({message:"No Laptops Found"})
+    } // in case of g series this will run 
+    const returnedValue = await hybridSearch("model",series);
+    if(returnedValue.length > 0) {
+        return res.status(200).json({message:"laptops",laptops:returnedValue})
+    }
+    return res.status(400).json({message:"No Laptops Found"})
+    }else if (ram) {
+    const ramValue = ram.split(" ")[0]
+    const laptops = await hybridSearch("ram",ramValue);
+    if(laptops.length > 0) {
+        return res.status(200).json({message:"laptops",laptops})
+    }
+    return res.status(400).json({message:"No Laptops Found"})
+    }else if (storage) {
+        let storageValue = storage.split(" ")[0]
+        if(storageValue == 1) {
+         storageValue = `1TB`
+        }
+        
+        const laptops = await hybridSearch("storage",storageValue);
+        if(laptops.length > 0) {
+            return res.status(200).json({message:"laptops",laptops})
+        }
+        return res.status(400).json({message:"No Laptops Found"})
+    }else if (graphics) {
+        const laptops = await hybridSearch("graphics",graphics);
+        if(laptops.length > 0) {
+            return res.status(200).json({message:"laptops",laptops})
+        }
+        return res.status(400).json({message:"No Laptops Found"})
+    }else if (price) {
 
-      if(laptops.length > 0 || laptops) {
-        return res.status(200).json({message:"Laptops Find Successful",laptops})
-      }
-      return res.status(400).json({message:"No Laptops Found"});
-     }else {
-        return res.status(400).json({message:"Laptop series is missing in query series"})
-     } 
+    }else if (processor) {
 
+        const laptops = await hybridSearch("processor",processor);
+        
+        if(laptops.length > 0) {
+            return res.status(200).json({message:"laptops",laptops})
+        }
+        return res.status(400).json({message:"No Laptops Found"})
+    }
     }catch(error) {
-     res.status(500).json({message:"Internal Server Error"})    
+     res.status(500).json({message:"Internal Server Error"});  
+    }
+
+})
+
+ServiceRouter.get('/getCart',checkAuthentication,async(req,res)=>{
+ 
+    try {
+      const {id} = req.user;
+      const cartProducts = await CartModel.find({userId:id});
+      if(cartProducts.length > 0) {
+        return res.status(200).json({message:"Products Found successful",products:cartProducts});
+      }
+      return res.status(400).json({message:"Please Add Products To carts",products:[]})
+    }catch (error) {
+        res.status(500).json({message:"Internal Server Error"})
     }
 })
+
+async function hybridSearch (key,value,searchSensitivity='i') {
+    const regex = new RegExp(value,searchSensitivity);
+    const laptops = await ProductModel.find({[key]:{$regex:regex}});    
+    return laptops;
+}
 
 
 module.exports = ServiceRouter;

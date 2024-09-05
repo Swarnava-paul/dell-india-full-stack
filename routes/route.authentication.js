@@ -5,18 +5,21 @@ const cors = require('cors')
 // user model
 const UserModel = require('../models/model.user')
 
+const checkAuthentication = require('../middlewares/middleware.Authentication')
+
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
-const session = require('express-session')
+const session = require('express-session');
 
 AuthRouter.use(session({ secret:process.env.Session_Secret_Key, resave: false, saveUninitialized: true }));
 AuthRouter.use(passport.initialize());
 AuthRouter.use(passport.session());
+const callbackuri = 'https://dell-india-full-stack.onrender.com/login/auth/google/callback';
 
 passport.use(new GoogleStrategy({
     clientID: process.env.Google_Auth_ClientId,
     clientSecret: process.env.Google_Auth_Client_Secret,
-    callbackURL: `https://dell-india-full-stack.onrender.com/login/auth/google/callback`
+    callbackURL: `http://localhost:${process.env.SERVER_RUNNING_PORT}/login/auth/google/callback`
   },
   async function(accessToken, refreshToken, profile, cb) {
     const email = profile.emails[0].value;
@@ -61,7 +64,7 @@ AuthRouter.get('/auth/google/callback',
         /*res.status(200).json({message:"Login Successful",token,name:firstName,email})*/
          const production = `https://dell-india.netlify.app?token=${token}`;
         const development = `http://localhost:5173?token=${token}`
-        res.redirect(production)
+        res.redirect(development)
       }catch(e) {
        res.status(500).json({message:"Internal server Error"})
       }
@@ -75,5 +78,15 @@ AuthRouter.get('/error',(req,res)=>{
   res.status(404).json({message:"Bad Request"})
 })
 
+AuthRouter.get('/getUserInfo',checkAuthentication,async(req,res)=>{
+try {
+const {id} = req.user;
+const findUser = await UserModel.find({_id:id});
+res.status(200).json({message:"User Fetched",name:findUser[0].name,email:findUser[0].email})
+
+}catch (error) {
+ res.status(500).json({message:"Internal Server Error"})
+}
+})
 
 module.exports = AuthRouter;
