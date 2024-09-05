@@ -10,14 +10,14 @@ const checkAuthentication = require('../middlewares/middleware.Authentication')
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
 const session = require('express-session');
-
+//'http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'
 AuthRouter.use(cors({
-  origin: ['http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'],
+  origin: ["*"],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-AuthRouter.options(cors({origin: ['http://localhost:4000', 'http://localhost:5173','https://dell-india.netlify.app/'],
+AuthRouter.options(cors({origin: ['*'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
