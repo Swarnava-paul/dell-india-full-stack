@@ -8,6 +8,10 @@ const ServiceRouter = express.Router();
 // middlewares
 const checkAuthentication = require('../middlewares/middleware.Authentication')
 
+//nodecache
+const Nodecache = require('node-cache');
+const cacheProductData = new Nodecache();
+
 ServiceRouter.use(express.json())
 
 ServiceRouter.get('/',(req,res)=>{
@@ -100,11 +104,19 @@ ServiceRouter.get('/getCart',checkAuthentication,async(req,res)=>{
         res.status(500).json({message:"Internal Server Error"})
     }
 })
-
+//without node cache avarage response time was initial 2.2s -> 500ms -> 400ms
+// now with nodecache initial resp time was > 500 and minimal was 6ms
 async function hybridSearch (key,value,searchSensitivity='i') {
-    const regex = new RegExp(value,searchSensitivity);
-    const laptops = await ProductModel.find({[key]:{$regex:regex}});    
-    return laptops;
+    const concatedKey = key+value;
+    let productData;
+    if (cacheProductData.has(concatedKey)) {
+        productData = cacheProductData.get(concatedKey)
+    } else {
+        const regex = new RegExp(value,searchSensitivity);
+        productData = await ProductModel.find({[key]:{$regex:regex}});    
+        cacheProductData.set(concatedKey,productData);
+    }
+    return productData;
 }
 
 
